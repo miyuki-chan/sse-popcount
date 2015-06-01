@@ -20,6 +20,7 @@
 #include "popcnt-sse-bit-parallel.cpp"
 #include "popcnt-sse-lookup.cpp"
 #include "popcnt-cpu.cpp"
+#include "popcnt-builtin.cpp"
 
 // --------------------------------------------------
 
@@ -28,7 +29,7 @@ void verify(const char* name, const std::uint8_t* data, const size_t size);
 struct function_t {
     const bool     is_reference;
     const char*    name;
-    std::uint64_t (*function)(const uint8_t* data, const size_t size);
+    std::uint64_t (*function)(const uint8_t* data, size_t size);
 };
 
 function_t functions[] = {
@@ -38,9 +39,11 @@ function_t functions[] = {
     {false, "bit-parallel-optimized",  popcnt_parallel_64bit_optimized},
     {false, "sse-bit-parallel",        popcnt_SSE_bit_parallel},
     {false, "sse-lookup",              popcnt_SSE_lookup},
-#ifdef HAVE_POPCNT_INSTRUCTION
-    {false, "cpu",                     popcnt_SSE_lookup} 
+#if HAVE_POPCNT_INSTRUCTION
+    {false, "cpu",                     popcnt_cpu_64bit},
 #endif
+    {false, "builtin 32-bit",           popcnt_builtin_32bit},
+    {false, "builtin 64-bit",           popcnt_builtin_64bit},
 };
 
 

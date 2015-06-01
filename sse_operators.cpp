@@ -39,14 +39,21 @@ __m128i operator>>(const __m128i a, const shift16 amount) {
     return _mm_srli_epi16(a, amount.bits);
 }
 
-
-uint64_t lower_qword(const __m128i v) {
-    
+#if HAVE_CVTSI128_SI64
+uint64_t lower_qword(const __m128i v)
+{
     return _mm_cvtsi128_si64(v);
 }
+#else
+uint64_t lower_qword(__m128i)
+{
+    /* TODO */
+    return 0;
+}
+#endif
 
 
-uint64_t higher_qword(const __m128i v) {
-
+uint64_t higher_qword(const __m128i v)
+{
     return lower_qword(_mm_srli_si128(v, 8));
 }

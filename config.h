@@ -1,5 +1,12 @@
 // define when cpu have popcnt instruction
-#define HAVE_POPCNT_INSTRUCTION 1
+#ifndef HAVE_POPCNT_INSTRUCTION
+#   define HAVE_POPCNT_INSTRUCTION 1
+#endif
+#ifndef HAVE_CVTSI128_SI64
+#   define HAVE_CVTSI128_SI64 1
+#endif
 
 // does your shell supports ansi color seqences?
-#define HAVE_ANSI_CONSOLE 1
+#ifndef HAVE_ANSI_CONSOLE
+#   define HAVE_ANSI_CONSOLE 1
+#endif

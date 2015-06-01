@@ -18,15 +18,18 @@
 #include "sse_operators.cpp"
 #include "popcnt-sse-bit-parallel.cpp"
 #include "popcnt-sse-lookup.cpp"
-
+#if HAVE_POPCNT_INSTRUCTION
 #include "popcnt-cpu.cpp"
+#else
+size_t popcnt_cpu_64bit(const std::uint8_t *, size_t) { assert(false); return 0; }
+#endif
+#include "popcnt-builtin.cpp"
 
 // --------------------------------------------------
 
 
 void print_help(const char* name);
 bool is_name_valid(const std::string& name);
-
 
 int main(int argc, char* argv[]) {
 
@@ -80,43 +83,32 @@ int main(int argc, char* argv[]) {
     const auto t1 = std::chrono::high_resolution_clock::now();
 
     if (name == "lookup-8") {
-        
-        while (k-- > 0) {
+        while (k-- > 0)
             n += popcnt_lookup_8bit(data, size);
-        }
-
     } else if (name == "lookup-64") {
-        
-        while (k-- > 0) {
+        while (k-- > 0)
             n += popcnt_lookup_64bit(data, size);
-        }
-
     } else if (name == "bit-parallel") {
-
-        while (k-- > 0) {
+        while (k-- > 0)
             n += popcnt_parallel_64bit_naive(data, size);
-        }
-
     } else if (name == "bit-parallel-optimized") {
-
-        while (k-- > 0) {
+        while (k-- > 0)
             n += popcnt_parallel_64bit_optimized(data, size);
-        }
     } else if (name == "sse-bit-parallel") {
-
-        while (k-- > 0) {
+        while (k-- > 0)
             n += popcnt_SSE_bit_parallel(data, size);
-        }
     } else if (name == "sse-lookup") {
-
-        while (k-- > 0) {
+        while (k-- > 0)
             n += popcnt_SSE_lookup(data, size);
-        }
     } else if (name == "cpu") {
-
-        while (k-- > 0) {
+        while (k-- > 0)
             n += popcnt_cpu_64bit(data, size);
-        }
+    } else if (name == "builtin32") {
+        while (k-- > 0)
+            n += popcnt_builtin_32bit(data, size);
+    } else if (name == "builtin64") {
+        while (k-- > 0)
+            n += popcnt_builtin_64bit(data, size);
     } else {
         assert(false && "wrong function name handling");
     }
@@ -125,7 +117,7 @@ int main(int argc, char* argv[]) {
 
     const std::chrono::duration<double> td = t2-t1;
 
-    printf("reference result = %lu, time = %10.6f s\n", n, td.count());
+    printf("reference result = %zu, time = %10.6f s\n", n, td.count());
 
     free(data);
 
@@ -143,9 +135,11 @@ void print_help(const char* name) {
     std::puts("   * bit-parallel            - naive bit parallel method");
     std::puts("   * bit-parallel-optimized  - a bit better bit parallel");
     std::puts("   * sse-bit-parallel        - SSE implementation of bit-parallel-optimized");
-#ifdef HAVE_POPCNT_INSTRUCTION
+#if HAVE_POPCNT_INSTRUCTION
     std::puts("   * cpu                     - CPU instruction popcnt (64-bit variant)");
 #endif
+    std::puts("   * builtin32               - Compiler built-in function (32-bit wide)");
+    std::puts("   * builtin64               - Compiler built-in function (64-bit wide)");
     std::puts("2. size - size of buffer in 16-bytes chunks");
     std::puts("3. iteration_count - as the name states");
 }
@@ -159,9 +153,11 @@ bool is_name_valid(const std::string& name) {
         || (name == "bit-parallel-optimized")
         || (name == "sse-bit-parallel")
         || (name == "sse-lookup")
-#ifdef HAVE_POPCNT_INSTRUCTION
+#if HAVE_POPCNT_INSTRUCTION
         || (name == "cpu")
 #endif
+        || (name == "builtin32")
+        || (name == "builtin64")
         ;
 }
 
