@@ -19,7 +19,9 @@
 #include "sse_operators.cpp"
 #include "popcnt-sse-bit-parallel.cpp"
 #include "popcnt-sse-lookup.cpp"
-#include "popcnt-cpu.cpp"
+#if HAVE_POPCNT_INSTRUCTION
+#   include "popcnt-cpu.cpp"
+#endif
 #include "popcnt-builtin.cpp"
 
 // --------------------------------------------------

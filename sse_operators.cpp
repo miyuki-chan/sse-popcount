@@ -48,7 +48,7 @@ uint64_t lower_qword(const __m128i v)
 uint64_t lower_qword(__m128i)
 {
     /* TODO */
-    return 0;
+    abort();
 }
 #endif
 
