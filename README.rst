@@ -1,8 +1,16 @@
+Important notice on copyright
+------------------------------------------------------------------------
+
+Author of all popcnt-related code is Wojciech Muła.
+See https://github.com/WojciechMula/sse-popcount
+
+This (modified) code differs only in benchmarking methods and compiler support
+
 ========================================================================
                            SIMD popcount
 ========================================================================
 
-Sample programs for my article http://0x80.pl/articles/sse-popcount.html
+Sample programs for article: http://0x80.pl/articles/sse-popcount.html
 
 Introduction
 ------------------------------------------------------------------------
@@ -22,8 +30,24 @@ As usual type ``make`` to compile programs, then you can invoke:
 You can also run ``make run`` to run ``speed`` for all available
 implementations.
 
+Testing architectures, compilers and compiler options
+------------------------------------------------------------------------
 
-Available implementations in new version
+``make_all.sh`` script can be used to test against different compilers,
+architectures and optimization flags. It needs to be configured: in the
+beginning of ``make_all.sh`` you will find arrays ``COMPILERS`` and
+``COMPILER_NAMES`` which must be modified according to compilers installed
+in your system.
+
+After invocation this script will create ``results`` directory, which will
+contain (for each triple "compiler-architecture-optimization flag"):
+* ``speed-*.s`` --- annotated assembly code
+* ``speed-*.cpp.100t.optimized`` --- dump of final GIMPLE IR (for GCC only)
+* ``speed-*.ll`` --- dump of LLVM IR (for Clang only)
+* ``results-*.txt`` --- benchmark results
+
+
+Available implementations in this version
 ------------------------------------------------------------------------
 
 There are following procedures:
@@ -38,14 +62,7 @@ There are following procedures:
   as described in the article: this gives **50% speedup**.
 * ``sse-bit-parallel`` --- SSE implementation of
   ``bit-parallel-optimized``
+* ``builtin32`` --- Compiler-provided built-in function (works with 32-bit dwords)
+* ``builtin64`` --- Same as above, but 64-bit qwords
+* ``cpu`` --- Intrinsic function for CPU instruction (same builtin64, when available)
 
-
-Results from core i5, program compiled by GCC 4.9.2::
-
-    running cpu                           time = 0.127574 s
-    running sse-lookup                    time = 0.147006 s
-    running sse-bit-parallel              time = 0.208366 s
-    running bit-parallel-optimized        time = 0.447463 s
-    running bit-parallel                  time = 0.683336 s
-    running lookup-8                      time = 0.668823 s
-    running lookup-64                     time = 0.687057 s
